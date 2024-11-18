@@ -21,13 +21,14 @@ import (
 	"math"
 	"math/big"
 
+	"github.com/holiman/uint256"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/holiman/uint256"
 )
 
 // ExecutionResult includes all output after executing given evm
@@ -152,6 +153,10 @@ type Message struct {
 
 // TransactionToMessage converts a transaction into a Message.
 func TransactionToMessage(tx *types.Transaction, s types.Signer, baseFee *big.Int) (*Message, error) {
+	if tx == nil {
+		return nil, nil
+	}
+
 	msg := &Message{
 		Nonce:            tx.Nonce(),
 		GasLimit:         tx.Gas(),
