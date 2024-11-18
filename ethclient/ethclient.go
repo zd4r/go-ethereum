@@ -125,6 +125,16 @@ type rpcBlock struct {
 	Withdrawals  []*types.Withdrawal `json:"withdrawals,omitempty"`
 }
 
+func (b *rpcBlock) RemoveEmptyTxs() {
+	transactions := make([]rpcTransaction, 0, len(b.Transactions))
+	for _, rpcTx := range b.Transactions {
+		if rpcTx.tx != nil {
+			transactions = append(transactions, rpcTx)
+		}
+	}
+	b.Transactions = transactions
+}
+
 func (ec *Client) getBlock(ctx context.Context, method string, args ...interface{}) (*types.Block, error) {
 	var raw json.RawMessage
 	err := ec.c.CallContext(ctx, &raw, method, args...)
@@ -146,6 +156,7 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 	if err := json.Unmarshal(raw, &body); err != nil {
 		return nil, err
 	}
+	body.RemoveEmptyTxs()
 	// Quick-verify transaction and uncle lists. This mostly helps with debugging the server.
 	if head.UncleHash == types.EmptyUncleHash && len(body.UncleHashes) > 0 {
 		return nil, errors.New("server returned non-empty uncle list but block header indicates no uncles")
@@ -234,10 +245,6 @@ type txExtraInfo struct {
 
 func (tx *rpcTransaction) UnmarshalJSON(msg []byte) error {
 	if err := json.Unmarshal(msg, &tx.tx); err != nil {
-		if err == types.ErrTxTypeNotSupported {
-			return nil
-		}
-		
 		return err
 	}
 	return json.Unmarshal(msg, &tx.txExtraInfo)
