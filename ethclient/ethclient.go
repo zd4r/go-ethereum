@@ -245,6 +245,11 @@ type txExtraInfo struct {
 
 func (tx *rpcTransaction) UnmarshalJSON(msg []byte) error {
 	if err := json.Unmarshal(msg, &tx.tx); err != nil {
+		if err == types.ErrTxTypeNotSupported {
+			tx.tx = nil
+			return nil
+		}
+
 		return err
 	}
 	return json.Unmarshal(msg, &tx.txExtraInfo)
