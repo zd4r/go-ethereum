@@ -410,7 +410,7 @@ func (tx *Transaction) UnmarshalJSON(input []byte) error {
 			}
 		}
 
-	case SystemTxType:
+	case BlastSystemTxType, ArbitrumInternalTxType:
 		var itx LegacyTx
 		inner = &itx
 		if dec.Nonce == nil {
