@@ -48,7 +48,7 @@ const (
 	AccessListTxType       = 0x01
 	DynamicFeeTxType       = 0x02
 	BlobTxType             = 0x03
-	BlastSystemTxType      = 0x7E
+	SystemTxType           = 0x7E
 	ArbitrumInternalTxType = 0x6A
 )
 
